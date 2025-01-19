@@ -1,0 +1,7 @@
+[
+    {"Name": "Greeting", "Content": "Hello {{.Name}},", "IsSelected": false},
+    {"Name": "Introduction", "Content": "I am {{.EngineerName}} from {{.Team}}.", "IsSelected": false},
+    {"Name": "Request for steps", "Content": "Kindly share the steps to reproduce your issue.", "IsSelected": false},
+    {"Name": "Request for credentials", "Content": "Please open the connection to your internal system and store the appropriate credentials in the Logon Depot as per note ##xxxx.", "IsSelected": false},
+    {"Name": "Closing Signature", "Content": "Kind regards,\n{{.EngineerName}}", "IsSelected": false}
+]
