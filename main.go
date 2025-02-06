@@ -7,6 +7,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
+
+	"github.com/atotto/clipboard"
 )
 
 type MessageSection struct {
@@ -15,22 +18,25 @@ type MessageSection struct {
 	IsSelected bool   `json:"IsSelected"`
 }
 
-func main() {
-	// Load templates
-	data, err := os.ReadFile("templates/default.json")
-	if err != nil {
-		fmt.Println("Error reading template file:", err)
-		os.Exit(1)
-	}
+// Data structure to hold placeholder values
+type TemplateData struct {
+	Name string
+}
 
-	var sections []MessageSection
-	if err := json.Unmarshal(data, &sections); err != nil {
-		fmt.Println("Error parsing templates:", err)
-		os.Exit(1)
+func main() {
+	generateMessage()
+}
+
+func generateMessage() {
+	// Load templates
+	sections, err := loadTemplates("templates/default.json")
+	if err != nil {
+		fmt.Println("Error loading templates:", err)
+		return
 	}
 
 	// Display template options
-	fmt.Println("Select sections to include in your message:")
+	fmt.Println("\nSelect sections to include in your message:")
 	for i, section := range sections {
 		fmt.Printf("[%d] %s\n", i+1, section.Name)
 	}
@@ -50,9 +56,51 @@ func main() {
 		}
 	}
 
-	// Combine selected sections
-	fmt.Println("\nGenerated Message:")
+	// Collect placeholder values
+	data := TemplateData{}
+	fmt.Print("Enter recipient's name: ")
+	data.Name, _ = reader.ReadString('\n')
+	data.Name = strings.TrimSpace(data.Name)
+
+	// Combine selected sections and replace placeholders
+	var message string
 	for _, section := range selectedSections {
-		fmt.Println(section.Content)
+		tmpl, err := template.New("message").Parse(section.Content)
+		if err != nil {
+			fmt.Printf("Error parsing template for section '%s': %v\n", section.Name, err)
+			continue
+		}
+
+		var result strings.Builder
+		if err := tmpl.Execute(&result, data); err != nil {
+			fmt.Printf("Error executing template for section '%s': %v\n", section.Name, err)
+			continue
+		}
+
+		message += result.String() + "\n\n"
 	}
+
+	fmt.Println("\nGenerated Message:")
+	fmt.Println(message)
+
+	// Copy to clipboard
+	if err := clipboard.WriteAll(message); err != nil {
+		fmt.Println("Error copying message to clipboard:", err)
+	} else {
+		fmt.Println("Message copied to clipboard! You can now paste it anywhere.")
+	}
+}
+
+func loadTemplates(filename string) ([]MessageSection, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	var sections []MessageSection
+	if err := json.Unmarshal(data, &sections); err != nil {
+		return nil, err
+	}
+
+	return sections, nil
 }
