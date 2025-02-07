@@ -41,12 +41,12 @@ func generateMessage() {
 		fmt.Printf("[%d] %s\n", i+1, section.Name)
 	}
 
-	fmt.Print("Enter the numbers of the sections you want to include (e.g., 1,3): ")
+	fmt.Print("Enter the numbers of the sections you want to include (as such: 1 2 3 5): ")
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
 
-	selectedIndexes := strings.Split(input, ",")
+	selectedIndexes := strings.Split(input, " ")
 	var selectedSections []MessageSection
 
 	for _, index := range selectedIndexes {
