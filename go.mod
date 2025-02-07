@@ -1,4 +1,4 @@
-module fin-template-wizard
+module template-wizard-cli
 
 go 1.23.4
 
