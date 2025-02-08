@@ -7,4 +7,5 @@ The Template Wizard CLI is a simple command-line tool written in Go that helps y
 This project is containerized using a multi-stage Docker build. The first stage uses the official Go image to build the binary, and the second stage packages it into a minimal Alpine Linux image. To build and run the container, simply use:
 
 ```docker build -t template-wizard-cli .```
+
 ```docker run --rm -ti template-wizard-cli```
