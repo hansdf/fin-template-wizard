@@ -1,13 +1,14 @@
-FROM golang:1.20 AS builder
+# Stage 1: Build the Go application
+FROM golang:latest AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o template-wizard-cli
+RUN go build -o template-wizard-cli .
 
-
+# Stage 2: Create a lightweight runtime image
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
+WORKDIR /app
 COPY --from=builder /app/template-wizard-cli .
-ENTRYPOINT ["./template-wizard-cli"]
+COPY --from=builder /app/templates ./templates
+CMD ["./template-wizard-cli"]
